@@ -158,9 +158,9 @@ body{font-family:'Noto Sans KR',sans-serif;color:#222;background:#fff;width:210m
 .hdr-pg{font-size:7pt;color:#999;margin-top:6px;letter-spacing:.06em;}
 .alert-bar{background:#D32F2F;padding:5mm 12mm;display:flex;align-items:center;gap:12px;flex-shrink:0;}
 .alert-num-wrap{display:flex;gap:0;}
-.alert-num-box{text-align:center;padding:0 14px;border-right:1px solid rgba(255,255,255,.25);}
+.alert-num-box{text-align:center;padding:0 8px;border-right:1px solid rgba(255,255,255,.25);min-width:0;flex:1;}
 .alert-num-box:last-child{border-right:none;}
-.a-val{font-size:28pt;font-weight:900;color:#fff;line-height:1;}
+.a-val{font-size:22pt;font-weight:900;color:#fff;line-height:1;}
 .a-unit{font-size:7pt;color:rgba(255,255,255,.75);}
 .a-name{font-size:7.5pt;font-weight:700;color:#FFCDD2;margin-top:3px;}
 .alert-divider{width:1px;background:rgba(255,255,255,.3);align-self:stretch;margin:0 14px;}
