@@ -2,7 +2,7 @@ services:
   - type: web
     name: pincet-health-report
     runtime: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: apt-get update && apt-get install -y fonts-noto-cjk && pip install -r requirements.txt
     startCommand: python app.py
     envVars:
       - key: ANTHROPIC_API_KEY
