@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: pincet-health-report
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
