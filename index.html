@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#1B1B1B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="핀셋분석">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<title>핀셋라이프 · 건강검진 AI 분석</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  background: #F4F3F0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── 헤더 ── */
+.header {
+  background: #1B1B1B;
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo { display: flex; align-items: center; gap: 12px; }
+.logo-mark {
+  width: 36px; height: 36px;
+  background: #D32F2F;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 900; color: #fff;
+}
+.logo-text { font-size: 16px; font-weight: 700; color: #fff; }
+.logo-sub   { font-size: 11px; color: #888; margin-top: 1px; }
+.header-badge {
+  font-size: 11px; font-weight: 600;
+  color: #9FCEC0;
+  background: rgba(255,255,255,0.08);
+  padding: 5px 12px;
+  border-radius: 20px;
+}
+
+/* ── 메인 ── */
+.main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+.card {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 560px;
+  overflow: hidden;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+}
+
+/* 카드 상단 */
+.card-top {
+  background: #1B1B1B;
+  padding: 28px 32px;
+}
+.card-eyebrow {
+  font-size: 10px; font-weight: 700;
+  color: #888; letter-spacing: 0.12em;
+  text-transform: uppercase; margin-bottom: 8px;
+}
+.card-title {
+  font-size: 22px; font-weight: 700;
+  color: #fff; line-height: 1.3; margin-bottom: 8px;
+}
+.card-desc { font-size: 13px; color: #999; line-height: 1.6; }
+
+/* 단계 표시 */
+.steps {
+  display: flex;
+  gap: 0;
+  background: #F4F3F0;
+  border-bottom: 1px solid #E8E8E6;
+}
+.step {
+  flex: 1;
+  padding: 12px 0;
+  text-align: center;
+  font-size: 11px; font-weight: 600;
+  color: #999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  border-right: 1px solid #E8E8E6;
+}
+.step:last-child { border-right: none; }
+.step.active { color: #1B1B1B; background: #fff; }
+.step-num {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: #DDD;
+  color: #999;
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+.step.active .step-num { background: #D32F2F; color: #fff; }
+.step.done .step-num { background: #2E7D32; color: #fff; }
+.step.done { color: #2E7D32; }
+
+/* 카드 바디 */
+.card-body { padding: 28px 32px; }
+
+/* 업로드 존 */
+.upload-zone {
+  border: 2px dashed #D0CEC8;
+  border-radius: 12px;
+  padding: 36px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #FAFAF8;
+}
+.upload-zone:hover { border-color: #1B1B1B; background: #F4F3F0; }
+.upload-zone.dragover { border-color: #D32F2F; background: #FFF5F5; }
+.upload-zone.has-file { border-color: #2E7D32; background: #F3FAF5; border-style: solid; }
+.upload-icon {
+  font-size: 36px; margin-bottom: 12px;
+  display: block;
+}
+.upload-title { font-size: 15px; font-weight: 700; color: #1B1B1B; margin-bottom: 6px; }
+.upload-hint  { font-size: 12px; color: #999; }
+.file-name-display {
+  font-size: 13px; font-weight: 600; color: #2E7D32;
+  margin-top: 8px; display: none;
+}
+input[type="file"] { display: none; }
+
+/* 분석 버튼 */
+.analyze-btn {
+  width: 100%;
+  margin-top: 16px;
+  padding: 16px;
+  background: #1B1B1B;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.analyze-btn:hover:not(:disabled) { background: #333; transform: translateY(-1px); }
+.analyze-btn:disabled { background: #CCC; cursor: not-allowed; transform: none; }
+.analyze-btn.loading { background: #D32F2F; }
+
+/* 로딩 상태 */
+.loading-state { display: none; padding: 28px 32px; }
+.loading-title { font-size: 16px; font-weight: 700; color: #1B1B1B; margin-bottom: 6px; }
+.loading-sub   { font-size: 13px; color: #888; margin-bottom: 24px; }
+.progress-wrap { background: #F4F3F0; border-radius: 8px; overflow: hidden; height: 6px; margin-bottom: 16px; }
+.progress-bar  { height: 100%; background: #D32F2F; border-radius: 8px; width: 0%; transition: width 0.5s ease; }
+.loading-steps { display: flex; flex-direction: column; gap: 8px; }
+.ls-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: #999; }
+.ls-item.done   { color: #2E7D32; }
+.ls-item.active { color: #1B1B1B; font-weight: 600; }
+.ls-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #DDD; flex-shrink: 0;
+}
+.ls-item.done   .ls-dot { background: #2E7D32; }
+.ls-item.active .ls-dot { background: #D32F2F; animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+/* 완료 상태 */
+.done-state { display: none; padding: 28px 32px; text-align: center; }
+.done-icon { font-size: 48px; margin-bottom: 12px; display: block; }
+.done-title { font-size: 18px; font-weight: 700; color: #1B1B1B; margin-bottom: 6px; }
+.done-sub   { font-size: 13px; color: #888; margin-bottom: 20px; }
+.download-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #D32F2F; color: #fff;
+  padding: 14px 28px; border-radius: 10px;
+  font-size: 14px; font-weight: 700;
+  text-decoration: none; cursor: pointer;
+  border: none; margin-bottom: 12px; width: 100%;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.download-btn:hover { background: #B71C1C; }
+.reset-btn {
+  background: none; border: 1.5px solid #DDD;
+  color: #888; padding: 10px 20px;
+  border-radius: 8px; font-size: 13px;
+  cursor: pointer; width: 100%;
+  transition: all 0.2s;
+}
+.reset-btn:hover { border-color: #1B1B1B; color: #1B1B1B; }
+
+/* 오류 */
+.error-msg {
+  display: none;
+  background: #FFF5F5; border: 1.5px solid #EF9A9A;
+  border-radius: 8px; padding: 12px 14px;
+  font-size: 13px; color: #B71C1C; margin-top: 12px;
+}
+
+/* 푸터 */
+.footer {
+  text-align: center;
+  padding: 16px;
+  font-size: 11px; color: #BBB;
+}
+
+/* 기능 소개 */
+.features {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+}
+.feat {
+  background: #FAFAF8;
+  border-radius: 8px;
+  padding: 14px 12px;
+  text-align: center;
+  border: 1px solid #EEEDEA;
+}
+.feat-icon { font-size: 20px; margin-bottom: 6px; display: block; }
+.feat-title { font-size: 11px; font-weight: 700; color: #1B1B1B; margin-bottom: 3px; }
+.feat-desc  { font-size: 10px; color: #999; line-height: 1.4; }
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-mark">핀</div>
+    <div>
+      <div class="logo-text">핀셋라이프</div>
+      <div class="logo-sub">건강검진 AI 분석 시스템</div>
+    </div>
+  </div>
+  <div class="header-badge">약국 협업 버전</div>
+</div>
+
+<!-- 메인 -->
+<div class="main">
+  <div class="card">
+
+    <!-- 카드 상단 -->
+    <div class="card-top">
+      <div class="card-eyebrow">AI-POWERED HEALTH REPORT</div>
+      <div class="card-title">건강검진 리포트를<br>업로드하면 끝입니다</div>
+      <div class="card-desc">AI가 자동으로 분석해서 영양소 · 영양제 · 보험 공백까지<br>고객 설득용 3페이지 리포트를 즉시 생성합니다</div>
+    </div>
+
+    <!-- 단계 -->
+    <div class="steps">
+      <div class="step active" id="step1">
+        <div class="step-num">1</div>
+        <span>PDF 업로드</span>
+      </div>
+      <div class="step" id="step2">
+        <div class="step-num">2</div>
+        <span>AI 분석</span>
+      </div>
+      <div class="step" id="step3">
+        <div class="step-num">3</div>
+        <span>리포트 다운로드</span>
+      </div>
+    </div>
+
+    <!-- 업로드 상태 -->
+    <div class="card-body" id="uploadState">
+      <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+        <span class="upload-icon">📄</span>
+        <div class="upload-title">건강검진 PDF를 여기에 드래그하거나 클릭하세요</div>
+        <div class="upload-hint">AI 질병예측 리포트 PDF 파일 지원</div>
+        <div class="file-name-display" id="fileNameDisplay"></div>
+      </div>
+      <input type="file" id="fileInput" accept=".pdf,application/pdf,*/*">
+
+      <div class="error-msg" id="errorMsg"></div>
+
+      <button class="analyze-btn" id="analyzeBtn" disabled onclick="startAnalysis()">
+        <span>📊</span> AI 분석 시작
+      </button>
+
+      <div class="features">
+        <div class="feat">
+          <span class="feat-icon">🔬</span>
+          <div class="feat-title">영양소 분석</div>
+          <div class="feat-desc">6종 영양소 결핍·과잉 자동 분석</div>
+        </div>
+        <div class="feat">
+          <span class="feat-icon">💊</span>
+          <div class="feat-title">영양제 추천</div>
+          <div class="feat-desc">우선순위 · 기대 효과 포함</div>
+        </div>
+        <div class="feat">
+          <span class="feat-icon">🛡️</span>
+          <div class="feat-title">보험 공백</div>
+          <div class="feat-desc">예상 치료비 · 상담 포인트</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 로딩 상태 -->
+    <div class="loading-state" id="loadingState">
+      <div class="loading-title">AI가 분석 중입니다</div>
+      <div class="loading-sub">잠시만 기다려 주세요 — 보통 20~40초 소요됩니다</div>
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div class="loading-steps">
+        <div class="ls-item" id="ls1"><div class="ls-dot"></div><span>PDF 텍스트 추출 중</span></div>
+        <div class="ls-item" id="ls2"><div class="ls-dot"></div><span>혈액 수치 · 영양소 분석 중</span></div>
+        <div class="ls-item" id="ls3"><div class="ls-dot"></div><span>영양제 우선순위 계산 중</span></div>
+        <div class="ls-item" id="ls4"><div class="ls-dot"></div><span>보험 공백 시나리오 도출 중</span></div>
+        <div class="ls-item" id="ls5"><div class="ls-dot"></div><span>3페이지 리포트 PDF 생성 중</span></div>
+      </div>
+    </div>
+
+    <!-- 완료 상태 -->
+    <div class="done-state" id="doneState">
+      <span class="done-icon">✅</span>
+      <div class="done-title">리포트 생성 완료!</div>
+      <div class="done-sub">3페이지 고객 설득용 리포트가 준비됐습니다<br>지금 바로 다운로드해서 고객에게 보여주세요</div>
+      <a class="download-btn" id="downloadBtn">
+        📥 리포트 저장하기 (PDF 3페이지)
+      </a>
+      <button class="reset-btn" onclick="reset()">다른 고객 분석하기</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer">
+  핀셋라이프 · 더금융서비스 포레스트사업단 · AI 분석 결과는 참고용이며 의학적 진단을 대체하지 않습니다
+</div>
+
+<script>
+const fileInput   = document.getElementById('fileInput');
+const dropZone    = document.getElementById('dropZone');
+const analyzeBtn  = document.getElementById('analyzeBtn');
+const fileNameEl  = document.getElementById('fileNameDisplay');
+const errorMsg    = document.getElementById('errorMsg');
+
+let selectedFile  = null;
+let downloadBlob  = null;
+let downloadName  = '건강검진_리포트.pdf';
+
+// 파일 선택
+fileInput.addEventListener('change', e => { if (e.target.files[0]) setFile(e.target.files[0]); });
+
+// 드래그앤드롭
+dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
+});
+
+function setFile(file) {
+  if (!file.name.endsWith('.pdf')) {
+    showError('PDF 파일만 업로드 가능합니다.');
+    return;
+  }
+  selectedFile = file;
+  dropZone.classList.add('has-file');
+  fileNameEl.textContent = '✓ ' + file.name;
+  fileNameEl.style.display = 'block';
+  analyzeBtn.disabled = false;
+  hideError();
+}
+
+function showError(msg) { errorMsg.textContent = msg; errorMsg.style.display = 'block'; }
+function hideError()    { errorMsg.style.display = 'none'; }
+
+// 단계 업데이트
+function setStep(n) {
+  [1,2,3].forEach(i => {
+    const el = document.getElementById('step'+i);
+    el.classList.remove('active','done');
+    if (i < n) el.classList.add('done');
+    if (i === n) el.classList.add('active');
+  });
+}
+
+// 로딩 애니메이션
+let loadingInterval = null;
+function startLoadingAnim() {
+  const steps = ['ls1','ls2','ls3','ls4','ls5'];
+  const pcts  = [15, 35, 55, 75, 90];
+  let idx = 0;
+
+  function tick() {
+    steps.forEach((id,i) => {
+      const el = document.getElementById(id);
+      el.classList.remove('active','done');
+      if (i < idx) el.classList.add('done');
+      if (i === idx) el.classList.add('active');
+    });
+    document.getElementById('progressBar').style.width = pcts[Math.min(idx, pcts.length-1)] + '%';
+    idx = Math.min(idx + 1, steps.length - 1);
+  }
+
+  tick();
+  return setInterval(tick, 5000);
+}
+
+async function startAnalysis() {
+  if (!selectedFile) return;
+
+  // UI 전환 — 로딩
+  document.getElementById('uploadState').style.display = 'none';
+  document.getElementById('loadingState').style.display = 'block';
+  setStep(2);
+
+  loadingInterval = startLoadingAnim();
+
+  const formData = new FormData();
+  formData.append('pdf', selectedFile);
+
+  try {
+    const resp = await fetch('/analyze', { method: 'POST', body: formData });
+    if (!resp.ok) {
+      const err = await resp.json();
+      throw new Error(err.error || '서버 오류가 발생했습니다');
+    }
+
+    const blob = await resp.blob();
+    const cd   = resp.headers.get('Content-Disposition') || '';
+    const match = cd.match(/filename\*?=(?:UTF-8'')?(.+)/);
+    if (match) downloadName = decodeURIComponent(match[1].replace(/"/g,''));
+
+    downloadBlob = blob;
+    clearInterval(loadingInterval);
+    document.getElementById('progressBar').style.width = '100%';
+
+    setTimeout(() => {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('doneState').style.display  = 'block';
+      setStep(3);
+      document.getElementById('step1').classList.add('done');
+      document.getElementById('step2').classList.add('done');
+    }, 600);
+
+  } catch (e) {
+    clearInterval(loadingInterval);
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('uploadState').style.display  = 'block';
+    setStep(1);
+    showError('오류: ' + e.message);
+  }
+}
+
+document.getElementById('downloadBtn').addEventListener('click', () => {
+  if (!downloadBlob) return;
+  const url = URL.createObjectURL(downloadBlob);
+  const a   = document.createElement('a');
+  a.href = url;
+  a.download = downloadName;
+  a.type = 'application/pdf';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 1000);
+});
+
+function reset() {
+  selectedFile = downloadBlob = null;
+  fileInput.value = '';
+  dropZone.classList.remove('has-file','dragover');
+  fileNameEl.style.display = 'none';
+  analyzeBtn.disabled = true;
+  hideError();
+  document.getElementById('doneState').style.display   = 'none';
+  document.getElementById('uploadState').style.display = 'block';
+  document.getElementById('progressBar').style.width   = '0%';
+  ['ls1','ls2','ls3','ls4','ls5'].forEach(id => {
+    document.getElementById(id).classList.remove('active','done');
+  });
+  setStep(1);
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+</script>
+</body>
+</html>
